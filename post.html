@@ -1,0 +1,61 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<h2>{{ session['user'] }}</h2>
+<a href="/create">Create</a> | <a href="/logout">Logout</a>
+
+{% for p in posts %}
+<div class="post">
+<b>{{ p['user'] }}</b>
+
+{% if p['image'] %}
+<img src="{{ url_for('static', filename='uploads/' + p['image']) }}">
+{% endif %}
+
+<p>{{ p['caption'] }}</p>
+
+<a href="/like/{{p['id']}}">❤️</a>
+<a href="/share/{{p['id']}}">🔁</a>
+<a href="/delete_post/{{p['id']}}">🗑️</a>
+
+<form method="post" action="/comment/{{p['id']}}">
+<input name="comment">
+<button>Post</button>
+</form>
+
+{% for c in comments.get(p['id'], []) %}
+<p>{{c['user']}}: {{c['comment']}}
+<a href="/delete_comment/{{c['id']}}">❌</a></p>
+{% endfor %}
+
+</div>
+{% endfor %}
+
+<div class="chatbox">
+<div id="msg"></div>
+<input id="input">
+<button onclick="send()">Send</button>
+<button onclick="voice()">🎤</button>
+</div>
+
+<script>
+function send(){
+let t=input.value;
+msg.innerHTML+="<div>You:"+t+"</div>";
+
+fetch("/chat",{method:"POST",
+headers:{"Content-Type":"application/x-www-form-urlencoded"},
+body:"msg="+t})
+.then(r=>r.json())
+.then(d=>{
+msg.innerHTML+="<div>Bot:"+d.reply+"</div>";
+speechSynthesis.speak(new SpeechSynthesisUtterance(d.reply));
+if(d.action=="create") location="/create";
+});
+}
+
+function voice(){
+let r=new (window.SpeechRecognition||webkitSpeechRecognition)();
+r.onresult=e=>{input.value=e.results[0][0].transcript;send();}
+r.start();
+}
+</script>

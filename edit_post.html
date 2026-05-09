@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form method="POST">
+    <input name="title" value="{{ post.title }}"><br>
+    <textarea name="content">{{ post.content }}</textarea><br>
+    <button>Update</button>
+</form>
+
+{% endblock %}

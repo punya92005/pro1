@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% for post in posts %}
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content[:100] }}</p>
+
+    <a href="/post/{{ post.id }}">Read</a> |
+    <a href="/like/{{ post.id }}">Like ({{ post.likes }})</a> |
+    <a href="/share/{{ post.id }}">Share</a> |
+    <a href="/edit/{{ post.id }}">Edit</a> |
+    <a href="/delete/{{ post.id }}">Delete</a>
+
+    <hr>
+{% endfor %}
+
+{% endblock %}

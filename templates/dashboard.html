@@ -1,0 +1,154 @@
+<!-- templates/dashboard.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Dashboard</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background:#f2f2f2;
+            margin:20px;
+        }
+
+        .post{
+            background:white;
+            padding:15px;
+            margin-bottom:20px;
+            border-radius:10px;
+            box-shadow:0 0 5px gray;
+        }
+
+        img{
+            border-radius:10px;
+        }
+
+        button{
+            padding:8px 12px;
+            cursor:pointer;
+            margin-top:5px;
+        }
+
+        input{
+            padding:8px;
+            width:250px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h2>Welcome {{ session['user'] }}</h2>
+
+<a href="/create">Create Post</a> |
+<a href="/logout">Logout</a>
+
+<hr>
+
+{% for p in posts %}
+
+<div class="post">
+
+    <h3>{{ p['user'] }}</h3>
+
+    {% if p['image'] %}
+        <img
+        src="{{ url_for('static', filename='uploads/' + p['image']) }}"
+        width="250">
+    {% endif %}
+
+    <p>{{ p['caption'] }}</p>
+
+    <p>❤️ {{ p['likes'] }}</p>
+
+    <a href="/like/{{ p['id'] }}">
+        <button>Like</button>
+    </a>
+
+    <a href="/delete_post/{{ p['id'] }}">
+        <button>Delete</button>
+    </a>
+
+    <!-- SHARE -->
+
+    <button onclick="copyLink({{p['id']}})">
+        🔗 Copy Link
+    </button>
+
+    <button onclick="shareWhatsApp({{p['id']}})">
+        📲 WhatsApp
+    </button>
+
+    <!-- COMMENT -->
+
+    <form method="post" action="/comment/{{ p['id'] }}">
+
+        <input
+            type="text"
+            name="comment"
+            placeholder="Write comment">
+
+        <button type="submit">
+            Comment
+        </button>
+
+    </form>
+
+    {% for c in comments.get(p['id'], []) %}
+
+        <p>
+            <b>{{ c['user'] }}</b> :
+            {{ c['comment'] }}
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endfor %}
+
+<script>
+
+    // 🔥 CHANGE THIS TO YOUR IPV4 ADDRESS
+
+    let serverIP = "192.168.29.101";
+
+    function copyLink(id){
+
+        let url =
+            "http://" +
+            serverIP +
+            ":5000/post/" +
+            id;
+
+        navigator.clipboard.writeText(url);
+
+        alert("Copied:\n" + url);
+    }
+
+    function shareWhatsApp(id){
+
+        let url =
+            "http://" +
+            serverIP +
+            ":5000/post/" +
+            id;
+
+        let whatsapp =
+            "https://wa.me/?text=" +
+            encodeURIComponent(
+                "Check my BlogVerse post 👇\n" + url
+            );
+
+        window.open(whatsapp, "_blank");
+    }
+
+</script>
+
+</body>
+</html>
